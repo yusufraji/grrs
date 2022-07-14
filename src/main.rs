@@ -14,9 +14,9 @@ struct Cli {
 fn main() -> Result<()> {
     let args = Cli::parse();
     println!("pattern to search for: {}", args.pattern);
-    println!("file path to read: {}", args.path.display());
+    println!("file path to read: {:?}", args.path);
 
-    let content = std::fs::read_to_string(&args.path).with_context(|| format!("could not read file '{}'", args.path.display()))?;
+    let content = std::fs::read_to_string(&args.path).with_context(|| format!("could not read file '{:?}'", args.path))?;
     for line in content.lines() {
         if line.contains(&args.pattern) {
             println!("{}", line);
