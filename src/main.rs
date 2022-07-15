@@ -2,7 +2,7 @@
 use clap::Parser;
 use anyhow::{Context, Result};
 
-// Search for a pattern in& a file and display the lines that contain it.
+// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 struct Cli {
     // The pattern to look for
@@ -17,10 +17,23 @@ fn main() -> Result<()> {
     println!("file path to read: {:?}", args.path);
 
     let content = std::fs::read_to_string(&args.path).with_context(|| format!("could not read file '{:?}'", args.path))?;
+    find_matches(&content, &args.pattern, &mut std::io::stdout());
+
+    Ok(())
+}
+
+
+fn find_matches(content: &str, pattern: &str, mut writer: impl std::io::Write) {
     for line in content.lines() {
-        if line.contains(&args.pattern) {
-            println!("{}", line);
+        if line.contains(pattern) {
+            writeln!(writer, "{}", line);
         }
     }
-    Ok(())
+}
+
+#[test]
+fn find_a_match() {
+    let mut result = Vec::new();
+    find_matches("lorem ipsum\ndolor sit amet", "lorem", &mut result);
+    assert_eq!(result, b"lorem ipsum\n");
 }
